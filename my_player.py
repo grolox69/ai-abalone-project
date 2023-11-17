@@ -25,7 +25,7 @@ class MyPlayer(PlayerAbalone):
         super().__init__(piece_type,name,time_limit,*args)
         self.player_id = self.get_id()
 
-    def get_opponent_id(self, current_state: GameState):
+    def get_opponent_id(self, current_state: GameState) -> int:
         for player in current_state.players:
             if player.get_id() != self.player_id:
                 return player.get_id()
@@ -85,9 +85,42 @@ class MyPlayer(PlayerAbalone):
 
             return (best_value, best_action)
         
-        depth = 5
+        depth = 3
         _, best_action = maximize(current_state, float('-inf'), float('inf'), depth)
         return best_action
     
     def evaluate_state(self, state: GameState) -> float:
-        return state.scores[self.player_id] - state.scores[self.get_opponent_id(state)]
+        # Simpple score difference heuristic (favorise opponent marbles out)
+        scores_heuristic = state.scores[self.player_id] - state.scores[self.get_opponent_id(state)]
+
+        center_control_heuristic = self.calculate_center_control(state, self.player_id) - self.calculate_center_control(state, self.get_opponent_id(state))
+
+        return scores_heuristic + center_control_heuristic
+    
+    def calculate_center_control(self, state: GameState, player_id: int) -> float:
+        """
+        Heuristic pour favoriser le controle du centre.
+        Calcule la moyenne de la distance de manhattan entre le centre et l'état (state).   
+
+        Args:
+            state (GameState): Current game state representation
+            player_id (int): ID du player 
+
+        Returns:
+            float: moyenne dist manhattan au centre
+        """
+        center = (8, 4)
+        total_distance = 0
+        piece_count = 0
+
+        for position, piece in state.get_rep().get_env().items():
+            if piece.get_owner_id() == player_id:
+                # Calculate Manhattan distance from the center
+                distance = abs(center[0] - position[0]) + abs(center[1] - position[1])
+                total_distance += distance
+                piece_count += 1
+
+        if piece_count == 0:
+            return 0
+
+        return -total_distance / piece_count
