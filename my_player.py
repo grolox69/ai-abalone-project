@@ -3,6 +3,8 @@ from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 from seahorse.utils.custom_exceptions import MethodNotImplementedError
 
+import time
+
 class MyPlayer(PlayerAbalone):
     """
     Player class for Abalone game.
@@ -39,39 +41,53 @@ class MyPlayer(PlayerAbalone):
         Returns:
             Action: selected feasible action
         """
-        depth = 6
-        best_action = None
-        best_value = float('-inf')
-
-        for action in current_state.generate_possible_actions():
-            value = self.minimize(action.get_next_game_state(), depth - 1)
-            if value > best_value:
-                best_value = value
-                best_action = action
-
+        begin = time.time()
+        best_action = self.alpha_beta(current_state)
+        print("Alpha-beta minimax time: ", time.time() - begin)
         return best_action
     
-    def maximize(self, current_state: GameState, depth: int) -> Action:
-        if depth == 0 or current_state.is_done():
-            return self.evaluate_state(current_state)
+    def alpha_beta(self, current_state: GameState) -> Action:
+        def maximize(current_state: GameState, alpha: float, beta: float, depth: int) -> (float, Action):
+            if depth == 0 or current_state.is_done():
+                return self.evaluate_state(current_state), None
 
-        best_value = float('-inf')
-        for action in current_state.generate_possible_actions():
-            value = self.minimize(action.get_next_game_state(), depth - 1)
-            best_value = max(best_value, value)
+            best_value = float('-inf')
+            best_action = None
+            for action in current_state.generate_possible_actions():
+                transition = action.get_next_game_state()
+                value, _ = minimize(transition, alpha, beta, depth - 1)
+                if value > best_value:
+                    best_value = value
+                    best_action = action
+                    alpha = max(alpha, best_value)
 
-        return best_value
+                if best_value >= beta:
+                    return (best_value, best_action)
+
+            return (best_value, best_action)
     
-    def minimize(self, current_state: GameState, depth: int) -> Action:
-        if depth == 0 or current_state.is_done():
-            return self.evaluate_state(current_state)
+        def minimize(current_state: GameState, alpha: float, beta: float,  depth: int) -> (float, Action):
+            if depth == 0 or current_state.is_done():
+                return self.evaluate_state(current_state), None
 
-        best_value = float('inf')
-        for action in current_state.generate_possible_actions():
-            value = self.maximize(action.get_next_game_state(), depth - 1)
-            best_value = min(best_value, value)
+            best_value = float('inf')
+            best_action = None
+            for action in current_state.generate_possible_actions():
+                transition = action.get_next_game_state()
+                value, _ = maximize(transition, alpha, beta, depth - 1)
+                if value < best_value:
+                    best_value = value
+                    best_action = action
+                    beta = min(beta, best_value)
+                
+                if best_value <= alpha:
+                    return (best_value, best_action)
 
-        return best_value
+            return (best_value, best_action)
+        
+        depth = 5
+        _, best_action = maximize(current_state, float('-inf'), float('inf'), depth)
+        return best_action
     
     def evaluate_state(self, state: GameState) -> float:
         return state.scores[self.player_id] - state.scores[self.get_opponent_id(state)]
