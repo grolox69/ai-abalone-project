@@ -25,7 +25,7 @@ class MyPlayer(PlayerAbalone):
         super().__init__(piece_type,name,time_limit,*args)
         self.player_id = self.get_id()
 
-    def get_opponent_id(self, current_state: GameState):
+    def get_opponent_id(self, current_state: GameState) -> int:
         for player in current_state.players:
             if player.get_id() != self.player_id:
                 return player.get_id()
@@ -58,20 +58,20 @@ class MyPlayer(PlayerAbalone):
         # piece_type = current_state.next_player.get_piece_type()
         # current_step = current_state.get_step()
 
-        # ## If starting position = classic
-        # ## Secure the center as fast as possible
-        # ### If white:
-        # ###   (1,3) -> down left
-        # ###   (5,1) -> down right
-        # ###   (3,1) -> bottom right
-        # ### If black:
-        # ###   (13,7) -> up left
-        # ###   If (8,4) is still empty:
-        # ###     (14,4) -> up right
-        # ###     (15,5) -> up right      
-        # ###   Else (white already moved into (8,4) ):
-        # ###     (15,5) -> up right
-        # ###     (14,6) -> up right      
+        ## If starting position = classic
+        ## Secure the center as fast as possible
+        ### If white:
+        ###   (1,3) -> down left
+        ###   (5,1) -> down right
+        ###   (3,1) -> bottom right
+        ### If black:
+        ###   (13,7) -> up left
+        ###   If (8,4) is still empty:
+        ###     (14,4) -> up right
+        ###     (15,5) -> up right      
+        ###   Else (white already moved into (8,4) ):
+        ###     (15,5) -> up right
+        ###     (14,6) -> up right      
         # if current_step < 6:
         #     if piece_type == 'W':
         #         if current_step == 0: # First move
@@ -116,12 +116,12 @@ class MyPlayer(PlayerAbalone):
             
             
 
-        # ## If starting position = alien
-        # ##
-        # # TODO
+        ## If starting position = alien
+        ##
+        # TODO
 
-        # ## If starting position = random
-        # ##  Pass
+        ## If starting position = random
+        ##  Pass
 
         # Main search strategy: minimax
         begin = time.time()
@@ -168,9 +168,42 @@ class MyPlayer(PlayerAbalone):
 
             return (best_value, best_action)
         
-        depth = 5
+        depth = 3
         _, best_action = maximize(current_state, float('-inf'), float('inf'), depth)
         return best_action
     
     def evaluate_state(self, state: GameState) -> float:
-        return state.scores[self.player_id] - state.scores[self.get_opponent_id(state)]
+        # Simpple score difference heuristic (favorise opponent marbles out)
+        scores_heuristic = state.scores[self.player_id] - state.scores[self.get_opponent_id(state)]
+
+        center_control_heuristic = self.calculate_center_control(state, self.player_id) - self.calculate_center_control(state, self.get_opponent_id(state))
+
+        return scores_heuristic + center_control_heuristic
+    
+    def calculate_center_control(self, state: GameState, player_id: int) -> float:
+        """
+        Heuristic pour favoriser le controle du centre.
+        Calcule la moyenne de la distance de manhattan entre le centre et l'état (state).   
+
+        Args:
+            state (GameState): Current game state representation
+            player_id (int): ID du player 
+
+        Returns:
+            float: moyenne dist manhattan au centre
+        """
+        center = (8, 4)
+        total_distance = 0
+        piece_count = 0
+
+        for position, piece in state.get_rep().get_env().items():
+            if piece.get_owner_id() == player_id:
+                # Calculate Manhattan distance from the center
+                distance = abs(center[0] - position[0]) + abs(center[1] - position[1])
+                total_distance += distance
+                piece_count += 1
+
+        if piece_count == 0:
+            return 0
+
+        return -total_distance / piece_count
