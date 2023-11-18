@@ -55,73 +55,73 @@ class MyPlayer(PlayerAbalone):
         # return current_state.convert_light_action_to_action(data={'from':(16,4), 'to':(14,4)})
 
         # Opening table
-        piece_type = current_state.next_player.get_piece_type()
-        current_step = current_state.get_step()
+        # piece_type = current_state.next_player.get_piece_type()
+        # current_step = current_state.get_step()
 
-        ## If starting position = classic
-        ## Secure the center as fast as possible
-        ### If white:
-        ###   (1,3) -> down left
-        ###   (5,1) -> down right
-        ###   (3,1) -> bottom right
-        ### If black:
-        ###   (13,7) -> up left
-        ###   If (8,4) is still empty:
-        ###     (14,4) -> up right
-        ###     (15,5) -> up right      
-        ###   Else (white already moved into (8,4) ):
-        ###     (15,5) -> up right
-        ###     (14,6) -> up right      
-        if current_step < 6:
-            if piece_type == 'W':
-                if current_step == 0: # First move
-                    next_action = current_state.convert_light_action_to_action( \
-                                            data={'from':(1,3), 'to':(3,3)})
-                elif current_step == 2: # Second move
-                    next_action = current_state.convert_light_action_to_action( \
-                                            data={'from':(5,1), 'to':(6,2)})
-                elif current_step == 4: # Third move
-                    next_action = current_state.convert_light_action_to_action( \
-                                            data={'from':(3,1), 'to':(4,2)})
+        # ## If starting position = classic
+        # ## Secure the center as fast as possible
+        # ### If white:
+        # ###   (1,3) -> down left
+        # ###   (5,1) -> down right
+        # ###   (3,1) -> bottom right
+        # ### If black:
+        # ###   (13,7) -> up left
+        # ###   If (8,4) is still empty:
+        # ###     (14,4) -> up right
+        # ###     (15,5) -> up right      
+        # ###   Else (white already moved into (8,4) ):
+        # ###     (15,5) -> up right
+        # ###     (14,6) -> up right      
+        # if current_step < 6:
+        #     if piece_type == 'W':
+        #         if current_step == 0: # First move
+        #             next_action = current_state.convert_light_action_to_action( \
+        #                                     data={'from':(1,3), 'to':(3,3)})
+        #         elif current_step == 2: # Second move
+        #             next_action = current_state.convert_light_action_to_action( \
+        #                                     data={'from':(5,1), 'to':(6,2)})
+        #         elif current_step == 4: # Third move
+        #             next_action = current_state.convert_light_action_to_action( \
+        #                                     data={'from':(3,1), 'to':(4,2)})
 
-            elif piece_type == 'B':
-                white_moved_into_center = False
+        #     elif piece_type == 'B':
+        #         white_moved_into_center = False
 
-                if current_step == 1: # First move
-                    next_action = current_state.convert_light_action_to_action( \
-                                            data={'from':(13,7), 'to':(12,6)})
+        #         if current_step == 1: # First move
+        #             next_action = current_state.convert_light_action_to_action( \
+        #                                     data={'from':(13,7), 'to':(12,6)})
 
-                elif current_step == 3: # Second move
-                    # check if (8,4) is empty on step 3:
-                    non_empty_tiles = current_state.get_rep().get_env().keys()
-                    print(non_empty_tiles)
+        #         elif current_step == 3: # Second move
+        #             # check if (8,4) is empty on step 3:
+        #             non_empty_tiles = current_state.get_rep().get_env().keys()
+        #             print(non_empty_tiles)
 
-                    if (8, 4) not in non_empty_tiles:
-                        white_moved_into_center = False
-                        next_action = current_state.convert_light_action_to_action( \
-                                        data={'from':(14,4), 'to':(12,4)})
-                    else:
-                        white_moved_into_center = True
-                        next_action = current_state.convert_light_action_to_action( \
-                                        data={'from':(15,5), 'to':(13,5)})
+        #             if (8, 4) not in non_empty_tiles:
+        #                 white_moved_into_center = False
+        #                 next_action = current_state.convert_light_action_to_action( \
+        #                                 data={'from':(14,4), 'to':(12,4)})
+        #             else:
+        #                 white_moved_into_center = True
+        #                 next_action = current_state.convert_light_action_to_action( \
+        #                                 data={'from':(15,5), 'to':(13,5)})
                     
-                elif current_step == 5: # Third move
-                    if white_moved_into_center == False:
-                        next_action = current_state.convert_light_action_to_action( \
-                                        data={'from':(15,5), 'to':(13,5)})
-                    else:
-                        next_action = current_state.convert_light_action_to_action( \
-                                        data={'from':(14,6), 'to':(12,6)})
-            return next_action
+        #         elif current_step == 5: # Third move
+        #             if white_moved_into_center == False:
+        #                 next_action = current_state.convert_light_action_to_action( \
+        #                                 data={'from':(15,5), 'to':(13,5)})
+        #             else:
+        #                 next_action = current_state.convert_light_action_to_action( \
+        #                                 data={'from':(14,6), 'to':(12,6)})
+        #     return next_action
             
             
 
-        ## If starting position = alien
-        ##
-        # TODO
+        # ## If starting position = alien
+        # ##
+        # # TODO
 
-        ## If starting position = random
-        ##  Pass
+        # ## If starting position = random
+        # ##  Pass
 
         # Main search strategy: minimax
         begin = time.time()
