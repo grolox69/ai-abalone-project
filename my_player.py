@@ -10,7 +10,11 @@ class MyPlayer(PlayerAbalone):
     Player class for Abalone game.
 
     Attributes:
-        piece_type (str): piece type of the player
+        piece_type   (str): piece type of the player
+        board_config (str): board configuration
+                            WARNING: We are aware that board configuration has no place
+                            under the player class, however we have been instructed not to
+                            change any other file for the purpose of this particular project.
     """
 
     def __init__(self, piece_type: str, name: str = "bob", time_limit: float=60*15,*args) -> None:
@@ -24,6 +28,7 @@ class MyPlayer(PlayerAbalone):
         """
         super().__init__(piece_type,name,time_limit,*args)
         self.player_id = self.get_id()
+        self.board_config = None
 
     def get_opponent_id(self, current_state: GameState) -> int:
         for player in current_state.players:
@@ -48,8 +53,14 @@ class MyPlayer(PlayerAbalone):
         print("Step: ", current_state.get_step())
         print("Piece type: ", current_state.next_player.get_piece_type()) # get player color
 
-        # TODO: detect starting position
-        best_action = self.move_from_opening_table("classic", current_state)
+        # Detect board configuration
+        step = current_state.get_step()
+        if step == 0:
+            self.detect_board_configuration(current_state)
+            print("Board configuration: ", self.board_config)
+
+        # Attempt to retrieve the next move from the hardcoded opening table
+        best_action = self.move_from_opening_table(self.board_config, current_state)
         if best_action != None:
             return best_action
 
@@ -60,7 +71,57 @@ class MyPlayer(PlayerAbalone):
         return best_action
     
 
+    def detect_board_configuration(self, current_state: GameState):
+        # Detect whether the starting board configuration is classic, alien, or neither of the two
 
+        # Board configuration can only be checked before any moves have been played
+        current_step = current_state.get_step()
+        if current_step != 0:
+            print("ERROR: board config detection can only take place before any move \
+                  has been played.")
+            return None
+
+        # Classic config
+        board_classic = [
+        [ 0 ,  0 , 'W', 'W', 'W', 'W', 'W',  0 ,  0 ],
+        [ 0 , 'W', 'W', 'W', 'W', 'W', 'W',  0 ,  0 ],
+        [ 0 ,  3 ,  3 , 'W', 'W', 'W',  3 ,  3 ,  0 ],
+        [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  0 ],
+        [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ],
+        [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  0 ],
+        [ 0 ,  3 ,  3 , 'B', 'B', 'B',  3 ,  3 ,  0 ],
+        [ 0 , 'B', 'B', 'B', 'B', 'B', 'B',  0 ,  0 ],
+        [ 0 ,  0 , 'B', 'B', 'B', 'B', 'B',  0 ,  0 ]
+        ]
+
+        # Alien config
+        board_alien = [
+        [ 0 ,  0 , 'B',  3 , 'B',  3 , 'B',  0 ,  0 ],
+        [ 0 ,  3 , 'B', 'W', 'W', 'B',  3 ,  0 ,  0 ],
+        [ 0 ,  3 , 'B', 'W', 'B', 'W', 'B',  3 ,  0 ],
+        [ 3 ,  3 ,  3 , 'B', 'B',  3 ,  3 ,  3 ,  0 ],
+        [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ],
+        [ 3 ,  3 ,  3 , 'W', 'W',  3 ,  3 ,  3 ,  0 ],
+        [ 0 ,  3 , 'W', 'B', 'W', 'B', 'W',  3 ,  0 ],
+        [ 0 ,  3 , 'W', 'B', 'B', 'W',  3 ,  0 ,  0 ],
+        [ 0 ,  0 , 'W',  3 , 'W',  3 , 'W',  0 ,  0 ]
+        ]
+
+        # Get current board grid representation
+        current_board = current_state.get_rep().get_grid()
+
+        print("DEBUG DEBUG DEBUG")
+        print("Board classic: ", board_classic, "\n")
+        print("Current board: ", current_board, "\n")
+        print("DEBUG DEBUG DEBUG")
+
+        if current_board == board_classic:
+            self.board_config = "classic"
+        elif current_board == board_alien:
+            self.board_config = "alien"
+        else:
+            self.board_config = "other"
+            
     def move_from_opening_table(self, starting_position: str, current_state: GameState) -> Action:
         # Opening table only covers the first three moves
         current_step = current_state.get_step()
