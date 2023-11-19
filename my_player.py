@@ -12,7 +12,7 @@ class MyPlayer(PlayerAbalone):
     Attributes:
         piece_type   (str): piece type of the player
         board_config (str): board configuration
-                            WARNING: We are aware that board configuration has no place
+                            WARNING: We are well aware that board configuration has no place
                             under the player class, however we have been instructed not to
                             change any other file for the purpose of this particular project.
     """
@@ -83,28 +83,28 @@ class MyPlayer(PlayerAbalone):
 
         # Classic config
         board_classic = [
-        [ 0 ,  0 , 'W', 'W', 'W', 'W', 'W',  0 ,  0 ],
-        [ 0 , 'W', 'W', 'W', 'W', 'W', 'W',  0 ,  0 ],
-        [ 0 ,  3 ,  3 , 'W', 'W', 'W',  3 ,  3 ,  0 ],
-        [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  0 ],
-        [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ],
-        [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  0 ],
-        [ 0 ,  3 ,  3 , 'B', 'B', 'B',  3 ,  3 ,  0 ],
-        [ 0 , 'B', 'B', 'B', 'B', 'B', 'B',  0 ,  0 ],
-        [ 0 ,  0 , 'B', 'B', 'B', 'B', 'B',  0 ,  0 ]
+            [ 0 ,  0 , 'W', 'W', 'W', 'W', 'W',  0 ,  0 ],
+            [ 0 , 'W', 'W', 'W', 'W', 'W', 'W',  0 ,  0 ],
+            [ 0 ,  3 ,  3 , 'W', 'W', 'W',  3 ,  3 ,  0 ],
+            [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  0 ],
+            [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ],
+            [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  0 ],
+            [ 0 ,  3 ,  3 , 'B', 'B', 'B',  3 ,  3 ,  0 ],
+            [ 0 , 'B', 'B', 'B', 'B', 'B', 'B',  0 ,  0 ],
+            [ 0 ,  0 , 'B', 'B', 'B', 'B', 'B',  0 ,  0 ]
         ]
 
         # Alien config
         board_alien = [
-        [ 0 ,  0 , 'B',  3 , 'B',  3 , 'B',  0 ,  0 ],
-        [ 0 ,  3 , 'B', 'W', 'W', 'B',  3 ,  0 ,  0 ],
-        [ 0 ,  3 , 'B', 'W', 'B', 'W', 'B',  3 ,  0 ],
-        [ 3 ,  3 ,  3 , 'B', 'B',  3 ,  3 ,  3 ,  0 ],
-        [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ],
-        [ 3 ,  3 ,  3 , 'W', 'W',  3 ,  3 ,  3 ,  0 ],
-        [ 0 ,  3 , 'W', 'B', 'W', 'B', 'W',  3 ,  0 ],
-        [ 0 ,  3 , 'W', 'B', 'B', 'W',  3 ,  0 ,  0 ],
-        [ 0 ,  0 , 'W',  3 , 'W',  3 , 'W',  0 ,  0 ]
+            [ 0 ,  0 , 'B',  3 , 'B',  3 , 'B',  0 ,  0 ],
+            [ 0 ,  3 , 'B', 'W', 'W', 'B',  3 ,  0 ,  0 ],
+            [ 0 ,  3 , 'B', 'W', 'B', 'W', 'B',  3 ,  0 ],
+            [ 3 ,  3 ,  3 , 'B', 'B',  3 ,  3 ,  3 ,  0 ],
+            [ 3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ,  3 ],
+            [ 3 ,  3 ,  3 , 'W', 'W',  3 ,  3 ,  3 ,  0 ],
+            [ 0 ,  3 , 'W', 'B', 'W', 'B', 'W',  3 ,  0 ],
+            [ 0 ,  3 , 'W', 'B', 'B', 'W',  3 ,  0 ,  0 ],
+            [ 0 ,  0 , 'W',  3 , 'W',  3 , 'W',  0 ,  0 ]
         ]
 
         # Get current board grid representation
