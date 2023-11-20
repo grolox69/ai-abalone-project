@@ -52,6 +52,7 @@ class TranspositionTableAbalone():
                 None
         """
         #TODO
+        state_hash = self.__compute_hash(state)
         print("TranspositionTable: Attempting retrieval for", state_hash)
         return None
     
@@ -61,6 +62,7 @@ class TranspositionTableAbalone():
         may be used in the future.
         """
         #TODO
+        state_hash = self.__compute_hash(state)
         print("TranspositionTable: storing", state_hash, state_value)
         return None
 
@@ -72,6 +74,8 @@ class TranspositionTableAbalone():
         Returns:
             str: A unique string representing a game state
         """
+        # TODO: implement
+        hash = "DUMMY"
         return hash
 
     def to_json(self) -> dict:
