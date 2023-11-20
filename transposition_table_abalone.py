@@ -37,8 +37,7 @@ class TranspositionTableAbalone():
         Returns:
             str: The string representation of the table.
         """
-        # TODO
-        string = None
+        string = self.to_json().dumps()
         return string
     
     def retrieve_value(self, state: GameState) -> float:
@@ -75,7 +74,15 @@ class TranspositionTableAbalone():
             str: A unique string representing a game state
         """
         # TODO: implement
-        hash = "DUMMY"
+        next_player_id = state.next_player.get_id()
+
+        # Create a long string representing board grid with no whitespaces
+        board_lines = []
+        for line in state.get_rep().get_grid():
+            board_lines.append(''.join(map(str, line)))
+        compact_board_grid = ''.join(board_lines)
+
+        hash = str(next_player_id) + compact_board_grid
         return hash
 
     def to_json(self) -> dict:
