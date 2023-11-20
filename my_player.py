@@ -3,6 +3,8 @@ from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 from seahorse.utils.custom_exceptions import MethodNotImplementedError
 
+from transposition_table_abalone import TranspositionTableAbalone
+
 import time
 
 class MyPlayer(PlayerAbalone):
@@ -15,6 +17,7 @@ class MyPlayer(PlayerAbalone):
                             WARNING: We are well aware that board configuration has no place
                             under the player class, however we have been instructed not to
                             change any other file for the purpose of this particular project.
+        transposition_table (TranspositionTable): table for caching calculated heuristics
     """
 
     def __init__(self, piece_type: str, name: str = "bob", time_limit: float=60*15,*args) -> None:
@@ -29,6 +32,7 @@ class MyPlayer(PlayerAbalone):
         super().__init__(piece_type,name,time_limit,*args)
         self.player_id = self.get_id()
         self.board_config = None
+        self.transposition_table = TranspositionTableAbalone(max_table_size = 100_000, replacement_queue_len = 1000)
 
     def get_opponent_id(self, current_state: GameState) -> int:
         for player in current_state.players:
@@ -283,16 +287,34 @@ class MyPlayer(PlayerAbalone):
         return best_action
     
     def evaluate_state(self, state: GameState) -> float:
-        # Simpple score difference heuristic (favorise opponent marbles out)
+        # Attempt retrieving a cached state value from transposition table
+        estimated_value_from_table = self.transposition_table.retrieve_value(state)
+
+        ## If hit, return said value
+        if estimated_value_from_table != None:
+            return estimated_value_from_table
+        ## If miss, compute heuristics
+        else:
+            state_value = self.compute_state_heuristic(state)
+
+        # Save calculated value to transposition table for future use
+        self.transposition_table.store_value(state, state_value)
+
+        return self.compute_state_heuristic(state)
+
+    def compute_state_heuristic(self, state: GameState) -> float:
+        # Estimate state value based on heuristics
+        ## Simple score difference heuristic (favors opponent marbles out)
         scores_heuristic = state.scores[self.player_id] - state.scores[self.get_opponent_id(state)]
 
         center_control_heuristic = self.calculate_center_control(state, self.player_id) - self.calculate_center_control(state, self.get_opponent_id(state))
 
-        return scores_heuristic + center_control_heuristic
-    
+        estimated_state_value = scores_heuristic + center_control_heuristic
+        return estimated_state_value
+
     def calculate_center_control(self, state: GameState, player_id: int) -> float:
         """
-        Heuristic pour favoriser le controle du centre.
+        Heuristique pour favoriser le controle du centre.
         Calcule la moyenne de la distance de manhattan entre le centre et l'état (state).   
 
         Args:

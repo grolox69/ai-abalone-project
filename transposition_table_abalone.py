@@ -4,7 +4,9 @@ Authors: Yann Roberge (1802531)
 
 Date created: 19-Nov-2023
 """
+from seahorse.game.game_state import GameState
 from util import Queue
+import json
 
 class TranspositionTableAbalone():
     """
@@ -14,7 +16,7 @@ class TranspositionTableAbalone():
         table   (dict[float]) : the large transposition table for our explored states.
                                     string-form state representations are associated to their
                                     previously evaluate heuristic value.
-        current_table_size  (int)       : how many states are currently stored in the table
+        n_table_entries     (int)       : how many states are currently stored in the table
         max_table_size      (int)       : size of table, measured in # of states stored.
                                         if entries are added when the table is full, then older
                                         elements will be removed as per the replacement policy.
@@ -24,7 +26,7 @@ class TranspositionTableAbalone():
 
     def __init__(self, max_table_size: int = 100_000, replacement_queue_len: int = 10_000) -> None:
         self.table = {}
-        self.table_entries = 0
+        self.n_table_entries = 0
         self.replacement_queue = Queue()
 
 
@@ -39,8 +41,7 @@ class TranspositionTableAbalone():
         string = None
         return string
     
-
-    def retrieve_value(self, state_hash: str) -> float:
+    def retrieve_value(self, state: GameState) -> float:
         """
         Retrieve the heuristic value associated to a hash from the table.
 
@@ -54,7 +55,7 @@ class TranspositionTableAbalone():
         print("TranspositionTable: Attempting retrieval for", state_hash)
         return None
     
-    def store_value(self, state_hash: str, state_value: float) -> None:
+    def store_value(self, state: GameState, state_value: float) -> None:
         """
         Store the heuristic value calculated for a state to the table, so that it
         may be used in the future.
@@ -62,3 +63,26 @@ class TranspositionTableAbalone():
         #TODO
         print("TranspositionTable: storing", state_hash, state_value)
         return None
+
+    def __compute_hash(self, state: GameState) -> str:
+        """
+        Convert a game state into a compact string form used as a hash in
+        the transposition table
+
+        Returns:
+            str: A unique string representing a game state
+        """
+        return hash
+
+    def to_json(self) -> dict:
+        """
+        Converts table to a JSON object.
+
+        Returns:
+            dict: The JSON representation of the table.
+        """
+        json_table = {"table" : json.dumps(self.table), \
+                "n_table_entries"   : self.n_table_entries, \
+                "replacement_queue" : json.dumps(self.replacement_queue.list), \
+                "replacement_queue_len": self.n_table_entries }
+        return json_table
