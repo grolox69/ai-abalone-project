@@ -46,13 +46,6 @@ class MyPlayer(PlayerAbalone):
         Returns:
             Action: selected feasible action
         """
-        [print(*x) for x in current_state.get_rep().get_grid()]
-        [print(a, b.__dict__) for a,b in current_state.get_rep().env.items()]
-
-        # Test: always return the same move
-        print("Step: ", current_state.get_step())
-        print("Piece type: ", current_state.next_player.get_piece_type()) # get player color
-
         # Detect board configuration
         step = current_state.get_step()
         if step == 0:
@@ -64,7 +57,7 @@ class MyPlayer(PlayerAbalone):
         if best_action != None:
             return best_action
 
-        # Main search strategy: minimax
+        # Main search strategy: Alpha-beta minimax
         begin = time.time()
         best_action = self.alpha_beta(current_state)
         print("Alpha-beta minimax time: ", time.time() - begin)
@@ -109,11 +102,6 @@ class MyPlayer(PlayerAbalone):
 
         # Get current board grid representation
         current_board = current_state.get_rep().get_grid()
-
-        print("DEBUG DEBUG DEBUG")
-        print("Board classic: ", board_classic, "\n")
-        print("Current board: ", current_board, "\n")
-        print("DEBUG DEBUG DEBUG")
 
         if current_board == board_classic:
             self.board_config = "classic"
@@ -287,8 +275,11 @@ class MyPlayer(PlayerAbalone):
         scores_heuristic = state.scores[self.player_id] - state.scores[self.get_opponent_id(state)]
 
         center_control_heuristic = self.calculate_center_control(state, self.player_id) - self.calculate_center_control(state, self.get_opponent_id(state))
+        cluster_heuristic = self.calculate_clustering(state, self.player_id) - self.calculate_clustering(state, self.get_opponent_id(state))
 
-        return scores_heuristic + center_control_heuristic
+        heuristic = scores_heuristic + 0.9 * center_control_heuristic + 0.4 * cluster_heuristic
+        # print(heuristic)
+        return heuristic
     
     def calculate_center_control(self, state: GameState, player_id: int) -> float:
         """
@@ -317,3 +308,56 @@ class MyPlayer(PlayerAbalone):
             return 0
 
         return -total_distance / piece_count
+    
+    def calculate_clustering(self, state: GameState, player_id: int) -> float:
+        """
+        Heuristic to favor keeping pieces in clusters.
+
+        Args:
+            state (GameState): Current game state representation
+            player_id (int): ID of the player
+
+        Returns:
+            float: Score representing the clustering of pieces
+        """
+        clustering_score = 0
+        processed = set()
+
+        # Calculate the number of adjacent friendly pieces for each piece
+        for position, piece in state.get_rep().get_env().items():
+            if piece.get_owner_id() == player_id and position not in processed:
+                cluster_size = self.get_cluster_size(state, position, player_id, processed)
+                clustering_score += cluster_size
+        return clustering_score
+
+    def get_cluster_size(self, state: GameState, start_position, player_id: int, processed: set) -> int:
+        """
+        Determine the size of the cluster starting from start_position.
+
+        Args:
+            state (GameState): Current game state representation
+            start_position (tuple): The starting position of the piece
+            player_id (int): ID of the player
+            processed (set): A set to record processed positions to avoid double counting
+
+        Returns:
+            int: Size of the cluster
+        """
+        queue = [start_position]
+        cluster_size = 0
+        while queue:
+            current_position = queue.pop(0)
+            if current_position in processed:
+                continue
+
+            processed.add(current_position)
+            current_piece = state.get_rep().get_env().get(current_position, None)
+
+            if current_piece and current_piece.get_owner_id() == player_id:
+                cluster_size += 1
+                # Add neighbors of current piece to queue to repeat process
+                neighbors = state.get_rep().get_neighbours(current_position[0], current_position[1])
+                for direction, neighbor in neighbors.items():
+                    if neighbor[1] not in processed:
+                        queue.append(neighbor[1])
+        return cluster_size
