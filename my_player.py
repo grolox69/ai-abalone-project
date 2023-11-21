@@ -32,7 +32,13 @@ class MyPlayer(PlayerAbalone):
         super().__init__(piece_type,name,time_limit,*args)
         self.player_id = self.get_id()
         self.board_config = None
-        self.transposition_table = TranspositionTableAbalone(max_table_size = 100_000, replacement_queue_len = 1000)
+        self.transposition_table = TranspositionTableAbalone(\
+                                        max_table_size = 1_000_000, \
+                                        replacement_queue_len = 10_000)
+
+        #### SEARCH DEPTH ####
+        self.search_depth = 3
+        ######################
 
     def get_opponent_id(self, current_state: GameState) -> int:
         for player in current_state.players:
@@ -282,7 +288,7 @@ class MyPlayer(PlayerAbalone):
 
             return (best_value, best_action)
         
-        depth = 3
+        depth = self.search_depth
         _, best_action = maximize(current_state, float('-inf'), float('inf'), depth)
         return best_action
     
