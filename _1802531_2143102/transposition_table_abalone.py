@@ -55,14 +55,10 @@ class TranspositionTableAbalone():
         # Compute hash
         state_hash = self.__compute_hash(state)
 
-        print("TranspositionTable: Attempting retrieval for", state_hash)
-
         # Return table value, none if entry is not in table
         if state_hash in self.table:
-            print("TranspositionTable: Hit for", state_hash)
             state_value = self.table[state_hash]
         else:
-            print("TranspositionTable: Miss for", state_hash)
             state_value = None
 
         return state_value
@@ -75,18 +71,13 @@ class TranspositionTableAbalone():
         # Compute hash
         state_hash = self.__compute_hash(state)
 
-        print("TranspositionTable: storing", state_hash, state_value)
-
         # If table is full, make room for the new entry
         # Else just store it
         #### TODO: REFACTOR, duplicated code in called functions
         if self.n_table_entries == self.max_table_size:
-            print("TranspositionTable: table full, making room for", state_hash)
             self.__replace_table_entry(state_hash)
         else:
-            print("TranspositionTable: stored", state_hash)
             self.n_table_entries += 1
-            print("TranspositionTable:", self.n_table_entries, "/", self.max_table_size)
             self.__enqueue_table_entry(state_hash)
         self.table[state_hash] = state_value
 
@@ -122,10 +113,7 @@ class TranspositionTableAbalone():
         if self.replacement_queue_current_size != self.replacement_queue_len:
             self.replacement_queue.push(new_state_hash)
             self.replacement_queue_current_size += 1
-            print("TranspositionTable: added", new_state_hash, "to queue")
-            print("TranspositionTable: queue", self.replacement_queue_current_size, "/", self.replacement_queue_len)
         else:
-            print("TranspositionTable: queue full")
             pass
 
         # Pop oldest entry, which is to be removed from the table,
@@ -133,7 +121,6 @@ class TranspositionTableAbalone():
         if not self.replacement_queue.isEmpty():
             oldest_entry = self.replacement_queue.pop()
             self.table.pop(oldest_entry)
-            print("TranspositionTable: took off", oldest_entry, "from queue and table")
 
     def __enqueue_table_entry(self, new_state_hash: str) -> None:
         """
@@ -145,10 +132,7 @@ class TranspositionTableAbalone():
         if self.replacement_queue_current_size != self.replacement_queue_len:
             self.replacement_queue.push(new_state_hash)
             self.replacement_queue_current_size += 1
-            print("TranspositionTable: added", new_state_hash, "to queue")
-            print("TranspositionTable: queue", self.replacement_queue_current_size, "/", self.replacement_queue_len)
         else:
-            print("TranspositionTable: queue full")
             pass
 
     def to_json(self) -> dict:
