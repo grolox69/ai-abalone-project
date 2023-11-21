@@ -282,7 +282,10 @@ class MyPlayer(PlayerAbalone):
     
     def evaluate_state(self, state: GameState) -> float:
         # Attempt retrieving a cached state value from transposition table
-        estimated_value_from_table = self.transposition_table.retrieve_value(state)
+        estimated_value_from_table = None
+        ###### FOR THE PURPOSE OF THE CONTEST, BYPASS TRANSPOSITION TABLE
+        ###### WHICH RESULTS IN MINOR PERFORMANCE IMPROVEMENT
+        # estimated_value_from_table = self.transposition_table.retrieve_value(state)
 
         ## If hit, return said value
         if estimated_value_from_table != None:
