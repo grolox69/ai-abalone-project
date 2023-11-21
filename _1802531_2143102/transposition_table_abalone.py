@@ -5,7 +5,7 @@ Authors: Yann Roberge (1802531)
 Date created: 19-Nov-2023
 """
 from seahorse.game.game_state import GameState
-from util import Queue
+from .util import Queue
 import json
 
 class TranspositionTableAbalone():

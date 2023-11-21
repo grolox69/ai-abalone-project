@@ -3,7 +3,7 @@ from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 from seahorse.utils.custom_exceptions import MethodNotImplementedError
 
-from transposition_table_abalone import TranspositionTableAbalone
+from _1802531_2143102.transposition_table_abalone import TranspositionTableAbalone
 
 import time
 
