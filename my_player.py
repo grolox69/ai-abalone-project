@@ -41,6 +41,15 @@ class MyPlayer(PlayerAbalone):
         ######################
 
     def get_opponent_id(self, current_state: GameState) -> int:
+        """
+        Retrieve the opponent's player ID within the current game state.
+
+        Args:
+            current_state (GameState): The current state of the game, which contains information about all players.
+
+        Returns:
+            int: The ID of the opponent player.
+        """
         for player in current_state.players:
             if player.get_id() != self.player_id:
                 return player.get_id()
@@ -70,12 +79,20 @@ class MyPlayer(PlayerAbalone):
         # Main search strategy: Alpha-beta minimax
         begin = time.time()
         best_action = self.alpha_beta(current_state)
-        print("Alpha-beta minimax time: ", time.time() - begin)
+        print("my_player step time: ", time.time() - begin)
         return best_action
     
 
     def detect_board_configuration(self, current_state: GameState):
-        # Detect whether the starting board configuration is classic, alien, or neither of the two
+        """
+        Detect whether the starting board configuration is classic, alien, or neither of the two
+        
+        Args:
+            current_state (GameState): The current state of the game including the board layout.
+
+        Returns:
+            None: This function does not return anything but sets the board_config attribute.
+        """
 
         # Board configuration can only be checked before any moves have been played
         current_step = current_state.get_step()
@@ -236,8 +253,17 @@ class MyPlayer(PlayerAbalone):
                                         data={'from':(12,4), 'to':(13,5)})
         return opening_action
 
-
     def alpha_beta(self, current_state: GameState) -> Action:
+        """
+        Implements the Alpha-Beta pruning algorithm to determine the best action in the current game state.
+        
+        Args:
+            current_state (GameState): The current state of the game.
+
+        Returns:
+            Action: The best action to take as determined by the Alpha-Beta algorithm.
+        """
+
         def maximize(current_state: GameState, alpha: float, beta: float, depth: int) -> (float, Action):
             if depth == 0 or current_state.is_done():
                 return self.evaluate_state(current_state), None
@@ -281,11 +307,18 @@ class MyPlayer(PlayerAbalone):
         return best_action
     
     def evaluate_state(self, state: GameState) -> float:
+        """
+        Evaluates the given game state and returns a numerical score representing its value.
+
+        Args:
+            state (GameState): The current state of the game to be evaluated.
+
+        Returns:
+            float: A numerical value representing the desirability of the given game state.
+        """
+
         # Attempt retrieving a cached state value from transposition table
-        estimated_value_from_table = None
-        ###### FOR THE PURPOSE OF THE CONTEST, BYPASS TRANSPOSITION TABLE
-        ###### WHICH RESULTS IN MINOR PERFORMANCE IMPROVEMENT
-        # estimated_value_from_table = self.transposition_table.retrieve_value(state)
+        estimated_value_from_table = self.transposition_table.retrieve_value(state)
 
         ## If hit, return said value
         if estimated_value_from_table != None:
